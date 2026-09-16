@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/profitability.dart';
 import '../models/scenario.dart';
+import '../services/feedback_actions.dart';
 import '../theme/app_theme.dart';
 
 /// Tarjeta de indicador (KPI) para mostrar un resultado.
@@ -294,7 +295,9 @@ class ScenarioSelector extends StatelessWidget {
           ],
           selected: {value},
           showSelectedIcon: false,
-          onSelectionChanged: (selection) => onChanged(selection.first),
+          onSelectionChanged: context.onSelection(
+            (Set<ScenarioType> selection) => onChanged(selection.first),
+          ),
         ),
         const SizedBox(height: 4),
         Text(value.description, style: Theme.of(context).textTheme.bodySmall),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/feedback_actions.dart';
 import '../widgets/info_widgets.dart';
 import 'cases_screen.dart';
 import 'cash_flow_screen.dart';
@@ -174,8 +175,17 @@ class ModuleScaffold extends StatelessWidget {
     if (!showAppBar) {
       return content;
     }
+    final navigator = Navigator.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(title), actions: actions),
+      appBar: AppBar(
+        title: Text(title),
+        actions: actions,
+        leading: navigator.canPop()
+            ? BackButton(
+                onPressed: context.onButton(() => navigator.maybePop()),
+              )
+            : null,
+      ),
       body: content,
     );
   }

@@ -5,6 +5,7 @@ import '../calculators/cost_calculator.dart';
 import '../calculators/production_calculator.dart';
 import '../models/mining_costs.dart';
 import '../models/project_data.dart';
+import '../services/feedback_actions.dart';
 import '../services/project_scope.dart';
 import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
@@ -262,7 +263,7 @@ class _CostsFormState extends State<_CostsForm> {
               Align(
                 alignment: Alignment.centerRight,
                 child: FilledButton.icon(
-                  onPressed: _apply,
+                  onPressed: context.onButton(_apply),
                   icon: const Icon(Icons.check),
                   label: const Text('Aplicar costos'),
                 ),

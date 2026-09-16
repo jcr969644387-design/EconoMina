@@ -7,6 +7,7 @@ import '../calculators/project_evaluator.dart';
 import '../models/learning_models.dart';
 import '../models/scenario.dart';
 import '../services/case_repository.dart';
+import '../services/feedback_actions.dart';
 import '../services/feedback_service.dart';
 import '../services/project_scope.dart';
 import '../theme/app_theme.dart';
@@ -73,9 +74,11 @@ class CasesScreen extends StatelessWidget {
               ),
               isThreeLine: true,
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => CaseDetailScreen(caseStudy: item),
+              onTap: context.onButton(
+                () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => CaseDetailScreen(caseStudy: item),
+                  ),
                 ),
               ),
             ),
@@ -171,7 +174,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
       actions: [
         IconButton(
           tooltip: 'Cargar en el simulador',
-          onPressed: _loadIntoSimulator,
+          onPressed: context.onButton(_loadIntoSimulator),
           icon: const Icon(Icons.upload_outlined),
         ),
       ],
@@ -247,21 +250,25 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
                 selected: option == _decision,
                 onSelected: _revealed
                     ? null
-                    : (_) => setState(() => _decision = option),
+                    : context.onSelection(
+                        (_) => setState(() => _decision = option),
+                      ),
               ),
           ],
         ),
         const SizedBox(height: 8),
         FilledButton.icon(
           key: const Key('reveal-case'),
-          onPressed: _decision == null || _revealed ? null : _reveal,
+          onPressed: context.onButton(
+            _decision == null || _revealed ? null : _reveal,
+          ),
           icon: const Icon(Icons.visibility_outlined),
           label: const Text('Ver solución'),
         ),
         if (_revealed) ..._solution(),
         const SizedBox(height: 12),
         OutlinedButton.icon(
-          onPressed: _loadIntoSimulator,
+          onPressed: context.onButton(_loadIntoSimulator),
           icon: const Icon(Icons.upload_outlined),
           label: const Text('Cargar este caso en el simulador'),
         ),

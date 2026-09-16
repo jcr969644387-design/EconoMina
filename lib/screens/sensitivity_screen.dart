@@ -7,6 +7,7 @@ import '../models/profitability.dart';
 import '../models/project_data.dart';
 import '../models/scenario.dart';
 import '../models/sensitivity_models.dart';
+import '../services/feedback_actions.dart';
 import '../services/project_scope.dart';
 import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
@@ -120,7 +121,9 @@ class _SensitivityScreenState extends State<SensitivityScreen> {
               ChoiceChip(
                 label: Text(variable.label),
                 selected: variable == _variable,
-                onSelected: (_) => setState(() => _variable = variable),
+                onSelected: context.onSelection(
+                  (_) => setState(() => _variable = variable),
+                ),
               ),
           ],
         ),

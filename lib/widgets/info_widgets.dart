@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/profitability.dart';
 import '../models/validation_result.dart';
+import '../services/feedback_actions.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_texts.dart';
 
@@ -397,7 +398,7 @@ class InvalidProjectNotice extends StatelessWidget {
         ValidationPanel(result: result),
         const SizedBox(height: 8),
         FilledButton.icon(
-          onPressed: onFix,
+          onPressed: context.onButton(onFix),
           icon: const Icon(Icons.edit_outlined),
           label: const Text('Corregir datos del proyecto'),
         ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../models/mineral_type.dart';
 import '../models/project_data.dart';
 import '../models/validation_result.dart';
+import '../services/feedback_actions.dart';
 import '../services/feedback_service.dart';
 import '../services/project_scope.dart';
 import '../services/validation_service.dart';
@@ -30,14 +31,14 @@ class ProjectDataScreen extends StatelessWidget {
         IconButton(
           tooltip: 'Restaurar proyecto de ejemplo',
           icon: const Icon(Icons.refresh),
-          onPressed: () {
+          onPressed: context.onButton(() {
             ProjectScope.read(context).resetProject();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Se restauró el proyecto de ejemplo.'),
               ),
             );
-          },
+          }),
         ),
       ],
       children: [
@@ -244,6 +245,7 @@ class _ProjectFormState extends State<_ProjectForm> {
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: TextFormField(
               controller: _name,
+              onTap: () => context.emitFeedback(FeedbackEvent.seleccion),
               decoration: const InputDecoration(
                 labelText: 'Nombre del proyecto',
                 helperText: 'Nombre descriptivo del proyecto ficticio.',
@@ -296,7 +298,7 @@ class _ProjectFormState extends State<_ProjectForm> {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
-              onPressed: _useReferenceValues,
+              onPressed: context.onButton(_useReferenceValues),
               icon: const Icon(Icons.auto_fix_high),
               label: const Text('Usar precio y ley de referencia'),
             ),
@@ -399,7 +401,9 @@ class _ProjectFormState extends State<_ProjectForm> {
               'Se aplica sobre el margen menos la depreciación lineal.',
             ),
             value: _taxEnabled,
-            onChanged: (value) => setState(() => _taxEnabled = value),
+            onChanged: context.onSelection(
+              (bool value) => setState(() => _taxEnabled = value),
+            ),
           ),
           NumberInputField(
             controller: _taxRate,
@@ -410,7 +414,7 @@ class _ProjectFormState extends State<_ProjectForm> {
           ),
           const SizedBox(height: 12),
           FilledButton.icon(
-            onPressed: _apply,
+            onPressed: context.onButton(_apply),
             icon: const Icon(Icons.check),
             label: const Text('Validar y aplicar'),
           ),
@@ -498,11 +502,11 @@ class _DropdownField<T> extends StatelessWidget {
               for (final entry in items.entries)
                 DropdownMenuItem<T>(value: entry.key, child: Text(entry.value)),
             ],
-            onChanged: (selected) {
+            onChanged: context.onSelection((T? selected) {
               if (selected != null) {
                 onChanged(selected);
               }
-            },
+            }),
           ),
         ),
       ),

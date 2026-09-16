@@ -50,9 +50,20 @@ class AppTheme {
       secondary: AppColors.copper,
       tertiary: AppColors.finance,
     );
+    // La aplicacion emite su propio sonido y vibracion con FeedbackService,
+    // que el estudiante puede apagar. Se desactiva la respuesta integrada de
+    // Material para no reproducirla dos veces ni fuera de esa preferencia.
+    const silent = ButtonStyle(enableFeedback: false);
     return ThemeData(
       colorScheme: scheme,
       scaffoldBackgroundColor: scheme.surface,
+      filledButtonTheme: const FilledButtonThemeData(style: silent),
+      elevatedButtonTheme: const ElevatedButtonThemeData(style: silent),
+      outlinedButtonTheme: const OutlinedButtonThemeData(style: silent),
+      textButtonTheme: const TextButtonThemeData(style: silent),
+      iconButtonTheme: const IconButtonThemeData(style: silent),
+      segmentedButtonTheme: const SegmentedButtonThemeData(style: silent),
+      listTileTheme: const ListTileThemeData(enableFeedback: false),
     );
   }
 }

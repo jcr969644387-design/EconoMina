@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/learning_models.dart';
+import '../services/feedback_actions.dart';
 import '../services/feedback_service.dart';
 import '../services/project_scope.dart';
 import '../services/quiz_repository.dart';
@@ -129,8 +130,10 @@ class _QuizScreenState extends State<QuizScreen> {
           ],
           selected: {_mode},
           showSelectedIcon: false,
-          onSelectionChanged: (selection) =>
-              setState(() => _mode = selection.first),
+          onSelectionChanged: context.onSelection(
+            (Set<PracticeMode> selection) =>
+                setState(() => _mode = selection.first),
+          ),
         ),
         const SizedBox(height: 8),
         if (_mode == PracticeMode.ejercicios)
@@ -213,7 +216,7 @@ class _QuizScreenState extends State<QuizScreen> {
         const SizedBox(height: 8),
         FilledButton.icon(
           key: const Key('quiz-next'),
-          onPressed: _next,
+          onPressed: context.onButton(_next),
           icon: const Icon(Icons.arrow_forward),
           label: Text(
             _index + 1 >= _questions.length
@@ -224,7 +227,7 @@ class _QuizScreenState extends State<QuizScreen> {
       ] else
         FilledButton.icon(
           key: const Key('quiz-check'),
-          onPressed: _selected == null ? null : _check,
+          onPressed: context.onButton(_selected == null ? null : _check),
           icon: const Icon(Icons.check),
           label: const Text('Comprobar respuesta'),
         ),
@@ -331,15 +334,17 @@ class _Summary extends StatelessWidget {
         ],
         const SizedBox(height: 8),
         FilledButton.icon(
-          onPressed: onRestart,
+          onPressed: context.onButton(onRestart),
           icon: const Icon(Icons.replay),
           label: const Text('Intentar de nuevo'),
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
-          onPressed: () => openModule(
-            context,
-            appModules.firstWhere((module) => module.id == 'tutor'),
+          onPressed: context.onButton(
+            () => openModule(
+              context,
+              appModules.firstWhere((module) => module.id == 'tutor'),
+            ),
           ),
           icon: const Icon(Icons.support_agent),
           label: const Text('Consultar al tutor económico'),

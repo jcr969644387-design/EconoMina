@@ -2,7 +2,10 @@ import 'package:flutter/services.dart';
 
 /// Momentos de la aplicación que reciben una respuesta táctil o sonora.
 enum FeedbackEvent {
-  /// Elegir una opción o cambiar de sección.
+  /// Pulsar un botón o una acción principal (Calcular, Aplicar, Volver...).
+  boton,
+
+  /// Tocar un campo de texto, elegir una opción o mover un selector.
   seleccion,
 
   /// Respuesta o cálculo correcto.
@@ -22,6 +25,9 @@ enum FeedbackEvent {
 /// la vibración se pide con `HapticFeedback`, que el sistema resuelve con la
 /// respuesta táctil estándar del dispositivo, y el sonido con `SystemSound`,
 /// que respeta el modo silencio del teléfono.
+///
+/// Todas las vibraciones son cortas y suaves, adecuadas para una aplicación
+/// de estudio: nunca se usa una vibración larga.
 class FeedbackService {
   const FeedbackService();
 
@@ -38,29 +44,39 @@ class FeedbackService {
     if (haptics) {
       await _guard(() => _vibrate(event));
     }
-    if (sound) {
-      await _guard(() => SystemSound.play(_soundFor(event)));
+    final tone = _soundFor(event);
+    if (sound && tone != null) {
+      await _guard(() => SystemSound.play(tone));
     }
   }
 
   Future<void> _vibrate(FeedbackEvent event) async {
     switch (event) {
+      case FeedbackEvent.boton:
       case FeedbackEvent.seleccion:
+        // Confirmación mínima del sistema, como la de un selector.
         await HapticFeedback.selectionClick();
       case FeedbackEvent.acierto:
         await HapticFeedback.lightImpact();
       case FeedbackEvent.error:
-        await HapticFeedback.heavyImpact();
       case FeedbackEvent.logro:
-        // Vibración más larga para distinguir el cierre de una actividad.
-        await HapticFeedback.vibrate();
+        await HapticFeedback.mediumImpact();
     }
   }
 
-  SystemSoundType _soundFor(FeedbackEvent event) {
-    return event == FeedbackEvent.error
-        ? SystemSoundType.alert
-        : SystemSoundType.click;
+  /// Sonido de cada evento; `null` cuando el evento solo vibra.
+  SystemSoundType? _soundFor(FeedbackEvent event) {
+    switch (event) {
+      case FeedbackEvent.seleccion:
+        // Tocar un campo o un selector solo vibra, para no saturar de clics.
+        return null;
+      case FeedbackEvent.error:
+        return SystemSoundType.alert;
+      case FeedbackEvent.boton:
+      case FeedbackEvent.acierto:
+      case FeedbackEvent.logro:
+        return SystemSoundType.click;
+    }
   }
 
   static Future<void> _guard(Future<void> Function() action) async {

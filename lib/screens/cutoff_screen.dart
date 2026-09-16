@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../calculators/cutoff_grade_calculator.dart';
 import '../models/cutoff_models.dart';
 import '../models/project_data.dart';
+import '../services/feedback_actions.dart';
 import '../services/project_scope.dart';
 import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
@@ -172,10 +173,12 @@ class _CutoffBodyState extends State<_CutoffBody> {
                     ],
                     selected: {_method},
                     showSelectedIcon: false,
-                    onSelectionChanged: (selection) {
+                    onSelectionChanged: context.onSelection((
+                      Set<CutoffMethod> selection,
+                    ) {
                       _method = selection.first;
                       _calculate(showMessage: false);
-                    },
+                    }),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -234,7 +237,7 @@ class _CutoffBodyState extends State<_CutoffBody> {
                   ),
                   const SizedBox(height: 8),
                   FilledButton.icon(
-                    onPressed: _calculate,
+                    onPressed: context.onButton(_calculate),
                     icon: const Icon(Icons.calculate_outlined),
                     label: const Text('Calcular ley de corte'),
                   ),

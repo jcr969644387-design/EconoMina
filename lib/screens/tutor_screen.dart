@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../calculators/cutoff_grade_calculator.dart';
+import '../services/feedback_actions.dart';
+import '../services/feedback_service.dart';
 import '../services/project_controller.dart';
 import '../services/project_scope.dart';
 import '../services/tutor/rule_based_tutor.dart';
@@ -103,7 +105,8 @@ class _TutorScreenState extends State<TutorScreen> {
                   key: const Key('tutor-input'),
                   controller: _question,
                   textInputAction: TextInputAction.send,
-                  onSubmitted: _ask,
+                  onTap: () => context.emitFeedback(FeedbackEvent.seleccion),
+                  onSubmitted: context.onSelection(_ask),
                   decoration: const InputDecoration(
                     labelText: 'Escribe tu pregunta',
                     hintText: 'Ejemplo: ¿qué significa un VAN negativo?',
@@ -113,7 +116,9 @@ class _TutorScreenState extends State<TutorScreen> {
                 const SizedBox(height: 8),
                 FilledButton.icon(
                   key: const Key('tutor-ask'),
-                  onPressed: _loading ? null : () => _ask(_question.text),
+                  onPressed: context.onButton(
+                    _loading ? null : () => _ask(_question.text),
+                  ),
                   icon: const Icon(Icons.send),
                   label: const Text('Preguntar'),
                 ),
@@ -132,7 +137,9 @@ class _TutorScreenState extends State<TutorScreen> {
             for (final topic in TutorTopic.values)
               ActionChip(
                 label: Text(topic.title),
-                onPressed: _loading ? null : () => _ask(topic.title),
+                onPressed: context.onButton(
+                  _loading ? null : () => _ask(topic.title),
+                ),
               ),
           ],
         ),
@@ -147,7 +154,7 @@ class _TutorScreenState extends State<TutorScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 12),
             child: TextButton.icon(
-              onPressed: () => openProjectData(context),
+              onPressed: context.onButton(() => openProjectData(context)),
               icon: const Icon(Icons.edit_note),
               label: const Text('Las respuestas se adaptan al proyecto activo'),
             ),
@@ -261,7 +268,9 @@ class _AnswerCard extends StatelessWidget {
                   for (final suggestion in answer.suggestions)
                     ActionChip(
                       label: Text(suggestion),
-                      onPressed: () => onSuggestion(suggestion),
+                      onPressed: context.onButton(
+                        () => onSuggestion(suggestion),
+                      ),
                     ),
                 ],
               ),

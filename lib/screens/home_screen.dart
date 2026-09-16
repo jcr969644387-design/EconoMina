@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../services/case_repository.dart';
+import '../services/feedback_actions.dart';
 import '../services/feedback_service.dart';
 import '../services/project_scope.dart';
 import '../theme/app_theme.dart';
@@ -151,11 +152,15 @@ Future<void> _confirmReset(BuildContext context) async {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(dialogContext).pop(false),
+          onPressed: dialogContext.onButton(
+            () => Navigator.of(dialogContext).pop(false),
+          ),
           child: const Text('Cancelar'),
         ),
         FilledButton(
-          onPressed: () => Navigator.of(dialogContext).pop(true),
+          onPressed: dialogContext.onButton(
+            () => Navigator.of(dialogContext).pop(true),
+          ),
           child: const Text('Reiniciar'),
         ),
       ],
@@ -317,7 +322,7 @@ class _ModuleButton extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         key: Key('module-${module.id}'),
-        onTap: () => openModule(context, module),
+        onTap: context.onButton(() => openModule(context, module)),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -393,7 +398,7 @@ class _ProgressSummary extends StatelessWidget {
                 ),
                 TextButton.icon(
                   key: const Key('reset-progress'),
-                  onPressed: onReset,
+                  onPressed: context.onButton(onReset),
                   icon: const Icon(Icons.restart_alt, size: 18),
                   label: const Text('Reiniciar'),
                 ),
@@ -447,10 +452,10 @@ class _FeedbackSettings extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SectionHeader(
-          title: 'Sonido y vibración',
+          title: 'Configuración',
           subtitle:
-              'Respuesta inmediata al comprobar respuestas, aplicar datos y '
-              'resolver casos.',
+              'Sonido y vibración de la aplicación. Se guardan junto con el '
+              'progreso.',
         ),
         Card(
           child: Column(
@@ -461,7 +466,7 @@ class _FeedbackSettings extends StatelessWidget {
                 secondary: const Icon(Icons.vibration),
                 title: const Text('Vibración'),
                 subtitle: const Text(
-                  'Un toque corto al acertar y uno más firme al fallar.',
+                  'Vibración muy ligera al tocar campos, opciones y botones.',
                 ),
                 onChanged: (value) =>
                     _apply(context, haptics: value, sound: soundEnabled),
@@ -472,7 +477,7 @@ class _FeedbackSettings extends StatelessWidget {
                 secondary: const Icon(Icons.volume_up_outlined),
                 title: const Text('Sonido'),
                 subtitle: const Text(
-                  'Usa los sonidos del sistema y respeta el modo silencio.',
+                  'Clic corto al pulsar un botón. Respeta el modo silencio.',
                 ),
                 onChanged: (value) =>
                     _apply(context, haptics: hapticsEnabled, sound: value),

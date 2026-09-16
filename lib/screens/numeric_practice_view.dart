@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/numeric_exercise.dart';
+import '../services/feedback_actions.dart';
 import '../services/feedback_service.dart';
 import '../services/numeric_exercise_generator.dart';
 import '../services/project_scope.dart';
@@ -144,6 +145,7 @@ class _NumericPracticeViewState extends State<NumericPracticeView> {
         TextField(
           key: const Key('numeric-answer'),
           controller: _answer,
+          onTap: () => context.emitFeedback(FeedbackEvent.seleccion),
           enabled: !answered,
           keyboardType: const TextInputType.numberWithOptions(
             decimal: true,
@@ -165,7 +167,7 @@ class _NumericPracticeViewState extends State<NumericPracticeView> {
         if (!answered)
           FilledButton.icon(
             key: const Key('numeric-check'),
-            onPressed: _check,
+            onPressed: context.onButton(_check),
             icon: const Icon(Icons.check),
             label: const Text('Comprobar resultado'),
           )
@@ -183,7 +185,7 @@ class _NumericPracticeViewState extends State<NumericPracticeView> {
           const SizedBox(height: 8),
           FilledButton.icon(
             key: const Key('numeric-next'),
-            onPressed: _next,
+            onPressed: context.onButton(_next),
             icon: const Icon(Icons.arrow_forward),
             label: Text(
               _index + 1 >= _exercises.length
@@ -225,7 +227,7 @@ class _NumericPracticeViewState extends State<NumericPracticeView> {
         const SizedBox(height: 8),
         FilledButton.icon(
           key: const Key('numeric-new'),
-          onPressed: _newPractice,
+          onPressed: context.onButton(_newPractice),
           icon: const Icon(Icons.autorenew),
           label: const Text('Practicar con datos nuevos'),
         ),

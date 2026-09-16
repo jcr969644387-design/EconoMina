@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../services/feedback_actions.dart';
+import '../services/feedback_service.dart';
 import '../utils/validators.dart';
 
 /// Campo numérico con unidad, explicación breve y validación.
@@ -38,6 +40,7 @@ class NumberInputField extends StatelessWidget {
           signed: min == null || min! < 0,
         ),
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        onTap: () => context.emitFeedback(FeedbackEvent.seleccion),
         decoration: InputDecoration(
           labelText: label,
           suffixText: unit,

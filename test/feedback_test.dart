@@ -1,6 +1,9 @@
+import 'package:economina/services/feedback_actions.dart';
 import 'package:economina/services/feedback_service.dart';
 import 'package:economina/services/progress_store.dart';
 import 'package:economina/services/project_controller.dart';
+import 'package:economina/services/project_scope.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -98,25 +101,88 @@ void main() {
       );
 
       const service = FeedbackService();
+      await service.emit(FeedbackEvent.boton);
       await service.emit(FeedbackEvent.seleccion);
       await service.emit(FeedbackEvent.error);
       await service.emit(FeedbackEvent.acierto, sound: false);
 
+      expect(calls, <String>[
+        // Boton: vibracion minima mas clic corto.
+        'HapticFeedback.vibrate:HapticFeedbackType.selectionClick',
+        'SystemSound.play:SystemSoundType.click',
+        // Seleccion: solo vibracion, sin sonido.
+        'HapticFeedback.vibrate:HapticFeedbackType.selectionClick',
+        // Error: vibracion corta y tono de aviso.
+        'HapticFeedback.vibrate:HapticFeedbackType.mediumImpact',
+        'SystemSound.play:SystemSoundType.alert',
+        // Acierto con el sonido apagado.
+        'HapticFeedback.vibrate:HapticFeedbackType.lightImpact',
+      ]);
       expect(
         calls,
-        containsAll(<String>[
-          'HapticFeedback.vibrate:HapticFeedbackType.selectionClick',
-          'HapticFeedback.vibrate:HapticFeedbackType.heavyImpact',
-          'HapticFeedback.vibrate:HapticFeedbackType.lightImpact',
-          'SystemSound.play:SystemSoundType.click',
-          'SystemSound.play:SystemSoundType.alert',
-        ]),
-      );
-      expect(
-        calls.where((call) => call.startsWith('SystemSound')),
-        hasLength(2),
-        reason: 'el tercer evento va sin sonido',
+        isNot(contains('HapticFeedback.vibrate:null')),
+        reason: 'ninguna vibracion es larga',
       );
     });
+    testWidgets('los botones suenan y los selectores solo vibran', (
+      tester,
+    ) async {
+      final service = RecordingFeedbackService();
+      final controller = ProjectController(feedback: service);
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(_harness(controller));
+
+      await tester.tap(find.byKey(const Key('probar-boton')));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('probar-selector')));
+      await tester.pump();
+
+      expect(service.events, [FeedbackEvent.boton, FeedbackEvent.seleccion]);
+    });
+
+    testWidgets('con los interruptores apagados no se emite nada', (
+      tester,
+    ) async {
+      final service = RecordingFeedbackService();
+      final controller = ProjectController(feedback: service)
+        ..setHapticsEnabled(false)
+        ..setSoundEnabled(false);
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(_harness(controller));
+
+      await tester.tap(find.byKey(const Key('probar-boton')));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('probar-selector')));
+      await tester.pump();
+
+      expect(service.events, isEmpty);
+    });
   });
+}
+
+/// Pantalla mínima con un botón y un selector envueltos por la extensión.
+Widget _harness(ProjectController controller) {
+  return ProjectScope(
+    controller: controller,
+    child: MaterialApp(
+      home: Scaffold(
+        body: Builder(
+          builder: (context) => Column(
+            children: [
+              FilledButton(
+                key: const Key('probar-boton'),
+                onPressed: context.onButton(() {}),
+                child: const Text('Calcular'),
+              ),
+              Switch(
+                key: const Key('probar-selector'),
+                value: false,
+                onChanged: context.onSelection((bool value) {}),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }

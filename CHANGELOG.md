@@ -2,6 +2,21 @@
 
 Todas las versiones siguen [Versionado Semántico](https://semver.org/lang/es/).
 
+## [1.3.0] - 2026-09-16
+
+### Añadido
+
+- Respuesta en todos los elementos interactivos de todas las pantallas: los botones (Calcular, Aplicar, Limpiar, Volver, Menú, tarjetas de módulo y de caso, chips de acción) emiten un clic corto del sistema con una vibración mínima, y los campos de texto, desplegables, interruptores, grupos de opciones y la barra de navegación emiten solo una vibración muy ligera.
+- Extensión `FeedbackActions` sobre `BuildContext` (`onButton`, `onInteraction`, `onSelection`) para envolver los callbacks sin tocar el diseño de las pantallas.
+- Botón de volver explícito en `ModuleScaffold`, para que la navegación hacia atrás también responda.
+- Pruebas de widgets que verifican que un botón emite `boton`, un selector emite `seleccion` y que con ambos interruptores apagados no se emite nada.
+
+### Cambiado
+
+- Los interruptores de **Configuración** son ahora la única fuente de la respuesta táctil y sonora: el tema desactiva `enableFeedback` en botones, listas, desplegables y grupos de opciones de Material para que la aplicación no suene por su cuenta cuando el estudiante lo apaga.
+- Todas las vibraciones son cortas: se retiró la vibración larga de fin de actividad y el golpe fuerte de error, reemplazados por impulsos medios.
+- El apartado de sonido y vibración de la pantalla de inicio se titula **Configuración**.
+
 ## [1.2.0] - 2026-09-16
 
 ### Añadido
