@@ -2,6 +2,19 @@
 
 Todas las versiones siguen [Versionado Semántico](https://semver.org/lang/es/).
 
+## [1.2.0] - 2026-09-16
+
+### Añadido
+
+- Retroalimentación táctil y sonora en toda la aplicación: vibración y un sonido corto del sistema al elegir una opción, al acertar, al fallar y al cerrar una práctica, aplicar datos o resolver un caso.
+- Interruptores de vibración y sonido en la pantalla de inicio; la preferencia se guarda junto con el progreso y llega activada.
+- `FeedbackService` sobre `HapticFeedback` y `SystemSound`, sin paquetes externos, archivos de audio ni el permiso `VIBRATE` de Android.
+- Pruebas de la retroalimentación: preferencias, persistencia y llamadas reales al canal de la plataforma.
+
+### Corregido
+
+- El flujo `build_apk.yml` no se ejecutaba nunca porque solo se activaba de forma manual o con etiquetas `v*` que el repositorio no tenía. Ahora compila el APK en cada `push` a `main` y lo adjunta a una publicación de GitHub cuando se etiqueta una versión.
+
 ## [1.1.0] - 2026-09-16
 
 ### Añadido

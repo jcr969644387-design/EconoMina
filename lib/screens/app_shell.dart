@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../services/feedback_service.dart';
+import '../services/project_scope.dart';
 import 'cases_screen.dart';
 import 'home_screen.dart';
 import 'project_data_screen.dart';
@@ -23,13 +27,19 @@ class _AppShellState extends State<AppShell> {
     TutorScreen(),
   ];
 
+  void _select(int value) {
+    final controller = ProjectScope.read(context);
+    unawaited(controller.playFeedback(FeedbackEvent.seleccion));
+    setState(() => _index = value);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _index, children: _pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
-        onDestinationSelected: (value) => setState(() => _index = value),
+        onDestinationSelected: _select,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),

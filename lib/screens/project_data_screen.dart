@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../models/mineral_type.dart';
 import '../models/project_data.dart';
 import '../models/validation_result.dart';
+import '../services/feedback_service.dart';
 import '../services/project_scope.dart';
 import '../services/validation_service.dart';
 import '../utils/formatters.dart';
@@ -180,6 +183,11 @@ class _ProjectFormState extends State<_ProjectForm> {
     );
   }
 
+  /// Vibración y sonido según lo que acaba de ocurrir.
+  void _feedback(FeedbackEvent event) {
+    unawaited(ProjectScope.read(context).playFeedback(event));
+  }
+
   void _apply() {
     final formValid = _formKey.currentState?.validate() ?? false;
     final draft = _draft();
@@ -190,6 +198,7 @@ class _ProjectFormState extends State<_ProjectForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Revisa los campos marcados en rojo.')),
       );
+      _feedback(FeedbackEvent.error);
       return;
     }
     final result = ProjectScope.read(context).updateProject(draft);
@@ -199,8 +208,10 @@ class _ProjectFormState extends State<_ProjectForm> {
           content: Text('Datos aplicados. Los resultados se actualizaron.'),
         ),
       );
+      _feedback(FeedbackEvent.logro);
     } else {
       setState(() => _lastAttempt = result);
+      _feedback(FeedbackEvent.error);
     }
   }
 

@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../models/numeric_exercise.dart';
+import '../services/feedback_service.dart';
 import '../services/numeric_exercise_generator.dart';
 import '../services/project_scope.dart';
 import '../theme/app_theme.dart';
@@ -51,12 +54,18 @@ class _NumericPracticeViewState extends State<NumericPracticeView> {
 
   NumericExercise get _current => _exercises[_index];
 
+  /// Vibración y sonido según lo que acaba de ocurrir.
+  void _feedback(FeedbackEvent event) {
+    unawaited(ProjectScope.read(context).playFeedback(event));
+  }
+
   void _check() {
     final value = NumberParser.parse(_answer.text);
     if (value == null) {
       setState(
         () => _inputError = 'Ingresa un número válido (ejemplo: 12.5 o 12,5).',
       );
+      _feedback(FeedbackEvent.error);
       return;
     }
     final correct = _current.isCorrect(value);
@@ -67,6 +76,7 @@ class _NumericPracticeViewState extends State<NumericPracticeView> {
         _score++;
       }
     });
+    _feedback(correct ? FeedbackEvent.acierto : FeedbackEvent.error);
   }
 
   void _next() {
@@ -75,6 +85,7 @@ class _NumericPracticeViewState extends State<NumericPracticeView> {
       ProjectScope.read(
         context,
       ).registerNumericResult(_score, _exercises.length);
+      _feedback(FeedbackEvent.logro);
       return;
     }
     setState(() {

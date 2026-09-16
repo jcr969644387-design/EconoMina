@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../services/case_repository.dart';
+import '../services/feedback_service.dart';
 import '../services/project_scope.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_texts.dart';
@@ -119,6 +122,11 @@ class HomeScreen extends StatelessWidget {
                     numericCount: controller.numericExerciseCount,
                     attempts: controller.attempts,
                     onReset: () => _confirmReset(context),
+                  ),
+                  const SizedBox(height: 12),
+                  _FeedbackSettings(
+                    hapticsEnabled: controller.hapticsEnabled,
+                    soundEnabled: controller.soundEnabled,
                   ),
                 ],
               ),
@@ -420,5 +428,74 @@ class _ProgressSummary extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Ajustes de vibración y sonido de la aplicación.
+class _FeedbackSettings extends StatelessWidget {
+  const _FeedbackSettings({
+    required this.hapticsEnabled,
+    required this.soundEnabled,
+  });
+
+  final bool hapticsEnabled;
+  final bool soundEnabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SectionHeader(
+          title: 'Sonido y vibración',
+          subtitle:
+              'Respuesta inmediata al comprobar respuestas, aplicar datos y '
+              'resolver casos.',
+        ),
+        Card(
+          child: Column(
+            children: [
+              SwitchListTile(
+                key: const Key('toggle-haptics'),
+                value: hapticsEnabled,
+                secondary: const Icon(Icons.vibration),
+                title: const Text('Vibración'),
+                subtitle: const Text(
+                  'Un toque corto al acertar y uno más firme al fallar.',
+                ),
+                onChanged: (value) =>
+                    _apply(context, haptics: value, sound: soundEnabled),
+              ),
+              SwitchListTile(
+                key: const Key('toggle-sound'),
+                value: soundEnabled,
+                secondary: const Icon(Icons.volume_up_outlined),
+                title: const Text('Sonido'),
+                subtitle: const Text(
+                  'Usa los sonidos del sistema y respeta el modo silencio.',
+                ),
+                onChanged: (value) =>
+                    _apply(context, haptics: hapticsEnabled, sound: value),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Guarda la preferencia y la demuestra al momento de activarla.
+  void _apply(
+    BuildContext context, {
+    required bool haptics,
+    required bool sound,
+  }) {
+    final controller = ProjectScope.read(context);
+    controller
+      ..setHapticsEnabled(haptics)
+      ..setSoundEnabled(sound);
+    if (haptics || sound) {
+      unawaited(controller.playFeedback(FeedbackEvent.seleccion));
+    }
   }
 }

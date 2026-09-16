@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../models/learning_models.dart';
+import '../services/feedback_service.dart';
 import '../services/project_scope.dart';
 import '../services/quiz_repository.dart';
 import '../theme/app_theme.dart';
@@ -53,25 +56,33 @@ class _QuizScreenState extends State<QuizScreen> {
 
   QuizQuestion get _current => _questions[_index];
 
+  /// Vibración y sonido según lo que acaba de ocurrir.
+  void _feedback(FeedbackEvent event) {
+    unawaited(ProjectScope.read(context).playFeedback(event));
+  }
+
   void _check() {
     final selected = _selected;
     if (selected == null) {
       return;
     }
+    final correct = selected == _current.correctIndex;
     setState(() {
       _answered = true;
-      if (selected == _current.correctIndex) {
+      if (correct) {
         _score++;
       } else {
         _missedTopics.add(_current.topic);
       }
     });
+    _feedback(correct ? FeedbackEvent.acierto : FeedbackEvent.error);
   }
 
   void _next() {
     if (_index + 1 >= _questions.length) {
       setState(() => _finished = true);
       ProjectScope.read(context).registerQuizResult(_score, _questions.length);
+      _feedback(FeedbackEvent.logro);
       return;
     }
     setState(() {
@@ -181,7 +192,12 @@ class _QuizScreenState extends State<QuizScreen> {
               : _selected == i
               ? _OptionState.wrong
               : _OptionState.neutral,
-          onTap: _answered ? null : () => setState(() => _selected = i),
+          onTap: _answered
+              ? null
+              : () {
+                  _feedback(FeedbackEvent.seleccion);
+                  setState(() => _selected = i);
+                },
         ),
       const SizedBox(height: 8),
       if (_answered) ...[

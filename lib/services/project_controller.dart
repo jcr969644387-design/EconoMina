@@ -6,6 +6,7 @@ import '../calculators/project_evaluator.dart';
 import '../models/project_data.dart';
 import '../models/scenario.dart';
 import '../models/validation_result.dart';
+import 'feedback_service.dart';
 import 'progress_store.dart';
 import 'validation_service.dart';
 
@@ -19,12 +20,14 @@ class ProjectController extends ChangeNotifier {
     ProgressStore? store,
     this.evaluator = const ProjectEvaluator(),
     this.validator = const ValidationService(),
+    this.feedback = const FeedbackService(),
   }) : _project = initialProject ?? ProjectData.defaultProject(),
        store = store ?? MemoryProgressStore();
 
   final ProjectEvaluator evaluator;
   final ValidationService validator;
   final ProgressStore store;
+  final FeedbackService feedback;
 
   ProjectData _project;
   ScenarioType _scenario = ScenarioType.base;
@@ -35,6 +38,8 @@ class ProjectController extends ChangeNotifier {
   int _numericExerciseCount = 0;
   int _attempts = 0;
   final Set<String> _solvedCases = <String>{};
+  bool _hapticsEnabled = true;
+  bool _soundEnabled = true;
   bool _restored = false;
   bool _disposed = false;
 
@@ -54,6 +59,12 @@ class ProjectController extends ChangeNotifier {
   int get attempts => _attempts;
 
   Set<String> get solvedCases => Set.unmodifiable(_solvedCases);
+
+  /// Vibración activada por el estudiante.
+  bool get hapticsEnabled => _hapticsEnabled;
+
+  /// Sonidos del sistema activados por el estudiante.
+  bool get soundEnabled => _soundEnabled;
 
   /// Verdadero cuando ya se intentó recuperar el progreso guardado.
   bool get restored => _restored;
@@ -131,6 +142,32 @@ class ProjectController extends ChangeNotifier {
     }
   }
 
+  /// Activa o desactiva la vibración en toda la aplicación.
+  void setHapticsEnabled(bool enabled) {
+    if (enabled == _hapticsEnabled) {
+      return;
+    }
+    _hapticsEnabled = enabled;
+    _changed();
+  }
+
+  /// Activa o desactiva los sonidos del sistema en toda la aplicación.
+  void setSoundEnabled(bool enabled) {
+    if (enabled == _soundEnabled) {
+      return;
+    }
+    _soundEnabled = enabled;
+    _changed();
+  }
+
+  /// Emite la retroalimentación de [event] respetando las preferencias.
+  Future<void> playFeedback(FeedbackEvent event) {
+    if (!_hapticsEnabled && !_soundEnabled) {
+      return Future<void>.value();
+    }
+    return feedback.emit(event, haptics: _hapticsEnabled, sound: _soundEnabled);
+  }
+
   /// Borra el progreso del estudiante (no modifica el proyecto activo).
   void resetProgress() {
     _bestQuizScore = 0;
@@ -169,6 +206,8 @@ class ProjectController extends ChangeNotifier {
     'numericExerciseCount': _numericExerciseCount,
     'attempts': _attempts,
     'solvedCases': _solvedCases.toList()..sort(),
+    'hapticsEnabled': _hapticsEnabled,
+    'soundEnabled': _soundEnabled,
   };
 
   void _applySnapshot(Map<String, Object?> data) {
@@ -192,6 +231,8 @@ class ProjectController extends ChangeNotifier {
         ..clear()
         ..addAll(cases.whereType<String>());
     }
+    _hapticsEnabled = _readBool(data['hapticsEnabled']);
+    _soundEnabled = _readBool(data['soundEnabled']);
     _cachedEvaluation = null;
   }
 
@@ -201,6 +242,9 @@ class ProjectController extends ChangeNotifier {
     }
     return 0;
   }
+
+  /// Las preferencias de sonido y vibración vienen activadas por defecto.
+  static bool _readBool(Object? value) => value is bool ? value : true;
 
   void _changed() {
     notifyListeners();

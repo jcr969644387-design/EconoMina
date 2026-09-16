@@ -32,6 +32,7 @@ Comprender cómo las reservas, leyes, recuperación metalúrgica, producción, p
 - **Decidir antes de ver la solución:** en los casos empresariales el estudiante elige continuar, estudiar más o no continuar, y luego compara su decisión con el criterio del simulador.
 - **Calcular y recibir retroalimentación:** la práctica numérica genera ejercicios nuevos en cada intento (costo unitario, metal contenido y recuperado, ingresos, ley de corte, valor presente, VAN y recuperación). La respuesta se verifica con tolerancia de redondeo y se explica paso a paso.
 - **Pensar como profesional:** el módulo VAN calcula el precio y la ley de equilibrio (VAN = 0) y el margen de seguridad; el módulo de sensibilidad identifica la variable crítica.
+- **Sentir la respuesta:** cada comprobación responde con vibración y un sonido corto del sistema (un toque suave al acertar, uno firme al fallar y una vibración más larga al terminar una práctica o resolver un caso). Se puede apagar desde la pantalla de inicio.
 - **Medir el progreso:** los casos resueltos, los mejores puntajes y el proyecto activo se guardan en el dispositivo.
 
 ## Tecnología
@@ -39,6 +40,7 @@ Comprender cómo las reservas, leyes, recuperación metalúrgica, producción, p
 - Flutter estable (CI anclado a 3.47.x), Dart ≥ 3.8, Material 3, modo claro por defecto.
 - Android, identificador `com.josuecr1801.economina`; Gradle 9.3.1, AGP 9.1.0, Kotlin 2.4.0 y Java 17 (plantilla oficial de Flutter).
 - Única dependencia: `shared_preferences`, para guardar el progreso **solo en el dispositivo**.
+- Vibración y sonido con `HapticFeedback` y `SystemSound` de `flutter/services`: sin paquetes externos, sin archivos de audio y sin el permiso `VIBRATE` de Android.
 - Sin red, sin cuentas y sin imágenes externas; gráficos propios con `CustomPainter`.
 
 ## Estructura
@@ -74,7 +76,7 @@ El APK universal queda en `build/app/outputs/flutter-apk/app-release.apk`.
 ## Integración continua
 
 - `flutter_ci.yml`: en `push` a `main`/`develop` y `pull_request` a `main` verifica formato, análisis estático y pruebas.
-- `build_apk.yml`: manual (`workflow_dispatch`) o con etiquetas `v*`; ejecuta pruebas, compila el APK universal, lo verifica y lo publica como artefacto `econo-mina-apk`.
+- `build_apk.yml`: en `push` a `main`, con etiquetas `v*` o de forma manual (`workflow_dispatch`); ejecuta pruebas, compila el APK universal, lo verifica y lo publica como artefacto `econo-mina-apk`. Con una etiqueta `v*` el APK además se adjunta a una publicación de GitHub, para descargarlo sin iniciar sesión.
 
 ## Documentación
 

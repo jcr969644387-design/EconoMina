@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../calculators/cost_calculator.dart';
@@ -5,6 +7,7 @@ import '../calculators/project_evaluator.dart';
 import '../models/learning_models.dart';
 import '../models/scenario.dart';
 import '../services/case_repository.dart';
+import '../services/feedback_service.dart';
 import '../services/project_scope.dart';
 import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
@@ -118,7 +121,9 @@ class _CaseDetailScreenState extends State<CaseDetailScreen> {
 
   void _reveal() {
     setState(() => _revealed = true);
-    ProjectScope.read(context).markCaseSolved(widget.caseStudy.id);
+    final controller = ProjectScope.read(context);
+    controller.markCaseSolved(widget.caseStudy.id);
+    unawaited(controller.playFeedback(FeedbackEvent.logro));
   }
 
   void _loadIntoSimulator() {
