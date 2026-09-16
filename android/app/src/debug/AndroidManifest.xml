@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Permiso necesario solo en desarrollo para depuración y recarga en
+         caliente de Flutter. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+</manifest>

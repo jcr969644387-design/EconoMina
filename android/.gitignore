@@ -1,0 +1,14 @@
+gradle-wrapper.jar
+/.gradle
+/captures/
+/gradlew
+/gradlew.bat
+/local.properties
+GeneratedPluginRegistrant.java
+.cxx/
+.kotlin/
+
+# Claves de firma: nunca se suben al repositorio.
+key.properties
+**/*.keystore
+**/*.jks

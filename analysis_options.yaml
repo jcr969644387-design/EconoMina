@@ -1,0 +1,13 @@
+# Reglas de análisis estático de EconoMina.
+# Se usan las recomendaciones oficiales de Flutter (flutter_lints), que
+# incluyen las reglas "core" y "recommended" del paquete lints.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - .dart_tool/**
+
+linter:
+  rules:
+    avoid_print: true

@@ -1,0 +1,41 @@
+# Archivos de sistema y editores
+.DS_Store
+*.swp
+.atom/
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.log
+*.tmp
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+pubspec.lock
+
+# Android
+android/.gradle/
+android/captures/
+android/local.properties
+android/gradlew
+android/gradlew.bat
+android/gradle/wrapper/gradle-wrapper.jar
+android/app/debug/
+android/app/profile/
+android/app/release/
+android/.kotlin/
+
+# Claves y secretos (nunca subir al repositorio)
+*.jks
+*.keystore
+key.properties
+*.pem
+.env
